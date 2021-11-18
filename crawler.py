@@ -3,7 +3,7 @@ from bs4 import SoupStrainer
 import requests
 import random
 import time
-import re   
+import re
 import cchardet
 
 # Page objects
@@ -44,14 +44,14 @@ def scrapeCPP():
                 # If the link we find is not already crawled, add it to the set of possible links we can crawl
                 if(link['href'] not in linksCrawled):
                     set_of_outlinks.add(link['href'])
-                
+
                 # Add the link to the page object's dictionary
                 newPage.outlinksDict.update({link['href'] : counter})
 
         # If the set of links we can crawl is empty, then stop crawling
         if len(set_of_outlinks) == 0:
             break
-        
+
         while True:
             try:
                 # Get new link from set of outlinks and set content for next loop
@@ -74,7 +74,7 @@ def scrapeCPP():
         # Time between each crawl so we don't get banned
         time.sleep(1.5)
     end = time.time()
-    
+
 
     # For loop to remove any links that are not a part of the links that are crawled, keep lists within crawled links
     # For each page object that we have crawled
@@ -87,7 +87,7 @@ def scrapeCPP():
                 del value.outlinksDict[key]
         # Update number of outlinks for this page object
         value.outlinks = len(value.outlinksDict)
-   
+
     # Prints the link, the number of outlinks it has, and what those outlinks are
     # Comment out for large crawls please
     for key, value in linksCrawled.items():

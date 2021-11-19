@@ -9,28 +9,41 @@ import cchardet
 # Page objects
 # Uses dictionary for O(1) lookup when calculating pagerank
 class page:
-    def __init__(self, outlinks):
+    def __init__(self, outlinks = 0, pagerank = 0):
         self.outlinks = outlinks
+        self.pagerank = pagerank
         self.outlinksDict = {}
 
 def scrapeCPP():
-    content = requests.get('https://www.cpp.edu/').content
     # Minimum number of links to crawl
     crawled = 0
     target = 5
 
     # Set of links we could crawl
     set_of_outlinks = set(())
-
+    
     # Dictionary stores all the links that we have crawled
     # Key = URL, Value = page object
-    linksCrawled = {'https://www.cpp.edu/' : 0}
+    linksCrawled = {'https://www.cpp.edu/index.shtml' : 0}
 
     start = time.time()
-    while crawled < target:
-        # Create new page object for the page we are crawling
-        newPage = page(0)
+    while len(linksCrawled) < target:
 
+        if crawled == 0:
+            content = requests.get('https://www.cpp.edu/index.shtml').content
+        else:
+            while True:
+                try:
+                    # Get new link from set of outlinks and set content for next loop
+                    newLink = random.choice(list(set_of_outlinks))
+                    set_of_outlinks.remove(newLink)
+                    content = requests.get(newLink).content
+                except requests.exceptions.ConnectionError:
+                    continue
+                break
+        # Create new page object for the page we are crawling
+        newPage = page()
+        
         # Counter variable that only serves to create the page object's dictionary
         counter = 0
         # Crawl through the page and only get links that are 'cpp.edu'
@@ -48,52 +61,61 @@ def scrapeCPP():
                 # Add the link to the page object's dictionary
                 newPage.outlinksDict.update({link['href'] : counter})
 
-        # If the set of links we can crawl is empty, then stop crawling
-        if len(set_of_outlinks) == 0:
-            break
-
-        while True:
-            try:
-                # Get new link from set of outlinks and set content for next loop
-                newLink = random.choice(list(set_of_outlinks))
-                list(set_of_outlinks).remove(newLink)
-                content = requests.get(newLink).content
-            except requests.exceptions.ConnectionError:
-                continue
-            break
-
         # Update the dictionary
         if crawled == 0: # If the page crawled is the first one
-            linksCrawled.update({'https://www.cpp.edu/' : newPage})
+            linksCrawled.update({'https://www.cpp.edu/index.shtml' : newPage})
         # Key = URL of next page we will crawl
         # Value = page Object
         else:
             linksCrawled.update({newLink : newPage})
+        
+        # Update number crawled
         crawled += 1
+        print(len(linksCrawled))
+
+        # If the set of links we can crawl is empty, then stop crawling
+        # If the number of crawled links reaches our target, then stop crawling
+        if len(set_of_outlinks) == 0 or len(linksCrawled) == target:
+            break
 
         # Time between each crawl so we don't get banned
         time.sleep(1.5)
     end = time.time()
 
+    #Recursive method to remove links not crawled AND remove links with no outlinks
+    removeLinks(linksCrawled)
 
-    # For loop to remove any links that are not a part of the links that are crawled, keep lists within crawled links
-    # For each page object that we have crawled
+    # After removal of links, initialize page rank values for each object
     for value in linksCrawled.values():
-        currentDict = value.outlinksDict
-        # For each key in the page's outlink dictionary
-        for key in list(currentDict.keys()):
-            # If that key is a URL we have not crawled, remove it
-            if key not in linksCrawled:
-                del value.outlinksDict[key]
-        # Update number of outlinks for this page object
-        value.outlinks = len(value.outlinksDict)
-
+        value.pagerank = 1 / len(linksCrawled)
+    
     # Prints the link, the number of outlinks it has, and what those outlinks are
     # Comment out for large crawls please
     for key, value in linksCrawled.items():
-        print(key, value.outlinks, value.outlinksDict)
+        print(key, value.outlinks, value.pagerank)
+        #Print to see what links the page outlinks to
+        #for outlink in value.outlinksDict.keys():
+            #print(outlink)
     print(end - start)
+    print("Dict Length: ", len(linksCrawled))
 
+def removeLinks(linksCrawled):
+    hasDanglingLink = False
+    for key, value in list(linksCrawled.items()):
+        currentDict = value.outlinksDict
+        # For each key in the page's outlink dictionary
+        for objKey in list(currentDict.keys()):
+            # If that key is a URL we have not crawled, remove it
+            if objKey not in linksCrawled:
+                del value.outlinksDict[objKey]
+        # Update number of outlinks for this page object
+        value.outlinks = len(value.outlinksDict)
+        # Remove the link from the dict if it has no outlinks
+        if value.outlinks == 0:
+            del linksCrawled[key]
+            hasDanglingLink = True
+    if hasDanglingLink:
+        removeLinks(linksCrawled)
 
 
 
@@ -102,17 +124,6 @@ def main():
     scrapeCPP()
     time_end = time.time()
     print('Time elapsed: ' + str(time_end - time_start) + ' sec')
-
-    # time_start = time.time()
-    # scrape('https://www.20minutes.fr/', 'fr')               # french
-    # time_end = time.time()
-    # print('Time elapsed: ' + str(time_end - time_start) + 'sec')
-
-    # time_start = time.time()
-    # scrape('https://elpais.com/america/', 'es')               # spanish
-    # time_end = time.time()
-    # print('Time elapsed: ' + str(time_end - time_start) + 'sec')
-
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,18 @@
+DATA SAMPLES FROM WIKIPEDIA:
+
+default -	~500 topics relevant to 'Rihanna'
+			https://en.wikipedia.org/wiki/Rihanna
+marvel - 	~1000 topics relevant to 'Characters of the Marvel Cinematic Universe'
+			https://en.wikipedia.org/wiki/
+ph-actress:	~700 topics relevant to 'List of Filipino actresses'
+			https://en.wikipedia.org/wiki/List_of_Filipino_actresses
+fish		~200 topics relevant to 'Tropical fish'
+			https://en.wikipedia.org/wiki/Tropical_fish
+
+TO USE:
+
+Change the file name for variable WIKI_DATA in main() (right now, it's in line 4) to desired folder
+default: 	'data/wiki-repo-final.csv'
+marvel: 		'data/marvel/wiki-repo-final.csv'
+ph-actress:	'data/ph-actress/wiki-repo-final.csv'
+fish:		'data/fish/wiki-repo-final.csv'

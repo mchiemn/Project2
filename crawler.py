@@ -116,12 +116,14 @@ def removeLinks(linksCrawled):
             hasDanglingLink = True
     if hasDanglingLink:
         removeLinks(linksCrawled)
+    
+    return linksCrawled
 
 
 
 def main():
     time_start = time.time()
-    scrapeCPP()
+    links_crawled = scrapeCPP()
     time_end = time.time()
     print('Time elapsed: ' + str(time_end - time_start) + ' sec')
 

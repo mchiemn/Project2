@@ -48,7 +48,7 @@ def page_rank(dictionary, iterations):
 def random_surfer_adjustments():
     pass
 
-#returns a link of inlinks for a page
+#returns a list of inlinks for a page
 def get_inlinks(dictionary, target_page):
     inlinks_list = []
     for k in dictionary.keys():

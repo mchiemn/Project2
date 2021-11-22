@@ -8,11 +8,14 @@ import cchardet
 
 # Page objects
 # Uses dictionary for O(1) lookup when calculating pagerank
+
+
 class page:
-    def __init__(self, outlinks = 0, pagerank = 0):
+    def __init__(self, outlinks=0, pagerank=0):
         self.outlinks = outlinks
         self.pagerank = pagerank
         self.outlinksDict = {}
+
 
 def scrapeCPP():
     # Minimum number of links to crawl
@@ -21,10 +24,10 @@ def scrapeCPP():
 
     # Set of links we could crawl
     set_of_outlinks = set(())
-    
+
     # Dictionary stores all the links that we have crawled
     # Key = URL, Value = page object
-    linksCrawled = {'https://www.cpp.edu/index.shtml' : 0}
+    linksCrawled = {'https://www.cpp.edu/index.shtml': 0}
 
     start = time.time()
     while len(linksCrawled) < target:
@@ -43,11 +46,11 @@ def scrapeCPP():
                 break
         # Create new page object for the page we are crawling
         newPage = page()
-        
+
         # Counter variable that only serves to create the page object's dictionary
         counter = 0
         # Crawl through the page and only get links that are 'cpp.edu'
-        for link in BeautifulSoup(content, parse_only = SoupStrainer('a', href=re.compile('cpp.edu/')), features='lxml'):
+        for link in BeautifulSoup(content, parse_only=SoupStrainer('a', href=re.compile('cpp.edu/')), features='lxml'):
             if hasattr(link, 'href') and link['href'].startswith('https'):
                 # Increase number of outlinks
                 # This will probably change so that it only contains number of outlinks
@@ -59,16 +62,16 @@ def scrapeCPP():
                     set_of_outlinks.add(link['href'])
 
                 # Add the link to the page object's dictionary
-                newPage.outlinksDict.update({link['href'] : counter})
+                newPage.outlinksDict.update({link['href']: counter})
 
         # Update the dictionary
-        if crawled == 0: # If the page crawled is the first one
-            linksCrawled.update({'https://www.cpp.edu/index.shtml' : newPage})
+        if crawled == 0:  # If the page crawled is the first one
+            linksCrawled.update({'https://www.cpp.edu/index.shtml': newPage})
         # Key = URL of next page we will crawl
         # Value = page Object
         else:
-            linksCrawled.update({newLink : newPage})
-        
+            linksCrawled.update({newLink: newPage})
+
         # Update number crawled
         crawled += 1
         print(len(linksCrawled))
@@ -82,13 +85,13 @@ def scrapeCPP():
         time.sleep(1.5)
     end = time.time()
 
-    #Recursive method to remove links not crawled AND remove links with no outlinks
+    # Recursive method to remove links not crawled AND remove links with no outlinks
     removeLinks(linksCrawled)
 
     # After removal of links, initialize page rank values for each object
     for value in linksCrawled.values():
         value.pagerank = 1 / len(linksCrawled)
-    
+
     '''# Prints the link, the number of outlinks it has, and what those outlinks are
     # Comment out for large crawls please
     for key, value in linksCrawled.items():
@@ -98,6 +101,7 @@ def scrapeCPP():
             #print(outlink)'''
 
     return linksCrawled
+
 
 def removeLinks(linksCrawled):
     hasDanglingLink = False
@@ -116,9 +120,8 @@ def removeLinks(linksCrawled):
             hasDanglingLink = True
     if hasDanglingLink:
         removeLinks(linksCrawled)
-    
-    return linksCrawled
 
+    return linksCrawled
 
 
 def get_cpp_dict():

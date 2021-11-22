@@ -1,5 +1,6 @@
 import csv
 from crawler import page
+import crawler
 import copy
 
 # See how-to.txt in data folder for more sample data
@@ -22,6 +23,11 @@ def page_rank(dictionary, iterations):
     inlinks_dict = {}
     for k in dictionary.keys():
         inlinks_dict[k] = get_inlinks(dictionary, k)
+
+    #important lambda values for random surfer adjustments
+    lmbda = 0.175
+    not_lmbda = 1-lmbda
+    lmbda_over_N = lmbda/len(dictionary)
     
     for i in range(iterations):
 
@@ -36,6 +42,8 @@ def page_rank(dictionary, iterations):
                 temp += temp_PR_dict[inlink]/dictionary[inlink].outlinks
             
             #update the page's pagerank !!in the object!! (temp_PR_dict still has old value)
+            temp *= not_lmbda
+            temp += lmbda_over_N
             dictionary[k].pagerank = temp
         
         #now that the iteration is complete, update temp_PR_dict with PR values for the next iteration
@@ -44,9 +52,11 @@ def page_rank(dictionary, iterations):
     #print the last iteration for now i guess
     print(temp_PR_dict)
 
-
-def random_surfer_adjustments():
-    pass
+    temp = 0
+    for k in dictionary.keys():
+        temp += dictionary[k].pagerank
+    print(temp)
+    
 
 #returns a list of inlinks for a page
 def get_inlinks(dictionary, target_page):
@@ -96,19 +106,14 @@ def build_dict(file):
 
 def main():
     # open .csv and build dictionary
-    wiki_dict = build_dict(WIKI_DATA)
-    # sample output for wiki_dict: ########
+    #wiki_dict = build_dict(WIKI_DATA)
 
-    #get_temp_PR_dict(wiki_dict)
-    '''for i in range(0, 20):
-        print("Topic:", end=' ')
-        print(dict_keys[i], end='\nNumber of outlinks: ')
-        print(wiki_dict[dict_keys[i]].outlinks, end='\nOutlinks: ')
-        print(wiki_dict[dict_keys[i]].outlinksDict)'''
-    # end sample output ##################
+    #
+    #page_rank(wiki_dict, 1)
 
+    cpp_dict = crawler.get_cpp_dict()
 
-    page_rank(wiki_dict, 10)
+    page_rank(cpp_dict, 100)
 
 
 

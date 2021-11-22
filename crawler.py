@@ -17,7 +17,7 @@ class page:
 def scrapeCPP():
     # Minimum number of links to crawl
     crawled = 0
-    target = 5
+    target = 20
 
     # Set of links we could crawl
     set_of_outlinks = set(())
@@ -89,15 +89,15 @@ def scrapeCPP():
     for value in linksCrawled.values():
         value.pagerank = 1 / len(linksCrawled)
     
-    # Prints the link, the number of outlinks it has, and what those outlinks are
+    '''# Prints the link, the number of outlinks it has, and what those outlinks are
     # Comment out for large crawls please
     for key, value in linksCrawled.items():
         print(key, value.outlinks, value.pagerank)
         #Print to see what links the page outlinks to
         #for outlink in value.outlinksDict.keys():
-            #print(outlink)
-    print(end - start)
-    print("Dict Length: ", len(linksCrawled))
+            #print(outlink)'''
+
+    return linksCrawled
 
 def removeLinks(linksCrawled):
     hasDanglingLink = False
@@ -121,11 +121,5 @@ def removeLinks(linksCrawled):
 
 
 
-def main():
-    time_start = time.time()
-    links_crawled = scrapeCPP()
-    time_end = time.time()
-    print('Time elapsed: ' + str(time_end - time_start) + ' sec')
-
-if __name__ == '__main__':
-    main()
+def get_cpp_dict():
+    return scrapeCPP()
